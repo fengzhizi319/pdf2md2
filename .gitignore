@@ -1,0 +1,37 @@
+# macOS / editors
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Python caches / virtual environments
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+.env
+.env.*
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Local data / generated outputs
+data/chroma/
+data/manifests/*.json
+pdf/*.md
+src/*.md
+src/*.pdf
+
+# Notebook / logs
+.ipynb_checkpoints/
+*.log
+

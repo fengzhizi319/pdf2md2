@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf2md-rag"
+version = "1.0.0"
+description = "Build a local RAG knowledge base from PDF -> Markdown -> chunks -> embeddings -> Chroma"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+authors = [{ name = "Charles" }]
+dependencies = [
+  "chromadb>=1.0.0",
+  "langchain-text-splitters>=0.3.0",
+  "marker-pdf>=1.10.0",
+  "pymupdf>=1.26.0",
+  "sentence-transformers>=3.0.0",
+  "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2.0",
+  "pre-commit>=4.0.0",
+  "pytest>=8.0.0",
+  "ruff>=0.11.0",
+]
+
+[project.scripts]
+pdf2md-rag = "pdf2md_rag.cli:app"
+pdf2md-rag-qa = "pdf2md_rag.simple_qa:app"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+

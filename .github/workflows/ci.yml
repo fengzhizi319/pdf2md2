@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    name: ruff + pytest (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-activate-base: false
+          activate-environment: conda_rag
+          python-version: "3.12"
+          channels: conda-forge,defaults
+          channel-priority: strict
+
+      - name: Sync environment
+        shell: bash -el {0}
+        run: |
+          conda env update -n conda_rag -f environment.yml --prune
+
+      - name: Lint
+        shell: bash -el {0}
+        run: |
+          ruff check .
+
+      - name: Verify syntax
+        shell: bash -el {0}
+        run: |
+          python -m compileall src examples tests
+
+      - name: Run tests
+        shell: bash -el {0}
+        run: |
+          pytest -q
+

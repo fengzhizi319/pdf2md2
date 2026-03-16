@@ -1,0 +1,12 @@
+name: conda_rag
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - llvm-openmp
+  - numpy=2.2.4
+  - scipy=1.15.3
+  - pip:
+      - -e .[dev]
+
