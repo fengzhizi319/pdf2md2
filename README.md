@@ -389,22 +389,23 @@ pdf2md-rag ingest \
 - [`examples/debug_embeddings.py`](examples/debug_embeddings.py)
   - 对应：`embeddings.build_embedder`
   - 作用：查看 embedding 维度和向量内容示例
-  - 特点：完全离线运行（默认 `hash`）
+  - 特点：默认使用真实 `sentence-transformers` 嵌入（首次运行会下载模型）
 - [`examples/debug_vectorstore.py`](examples/debug_vectorstore.py)
   - 对应：`vectorstore.upsert_chunks` / `vectorstore.query_collection`
   - 作用：查看向量入库与 Top-K 查询结果
-  - 特点：完全离线运行（默认 `hash` + 临时 Chroma）
+  - 特点：默认使用真实 `sentence-transformers` 嵌入 + 临时 Chroma
 - [`examples/debug_search.py`](examples/debug_search.py)
   - 对应：`search.search_chunks`
   - 作用：查看 `SearchHit`、`sources` 和 `context_text`
-  - 特点：完全离线运行（默认 `hash` + 临时 Chroma）
+  - 特点：默认使用真实 `sentence-transformers` 嵌入 + 临时 Chroma
 - [`examples/debug_qa.py`](examples/debug_qa.py)
   - 对应：`simple_qa.ask_question`
   - 作用：查看 QA 层如何把检索结果拼成 prompt 并得到答案
-  - 特点：完全离线运行（用假的 OpenAI-compatible 响应）
+  - 特点：embedding 使用真实 `sentence-transformers`；LLM 仍用假的 OpenAI-compatible 响应
 - [`examples/debug_ingest.py`](examples/debug_ingest.py)
   - 对应：`pipeline.ingest_pdf`
   - 作用：查看完整 ingest 执行结果
+  - 特点：默认使用真实 `sentence-transformers` 嵌入，可通过环境变量 `PDF2MD_RAG_EMBEDDING_MODEL` 覆盖模型名
 
 推荐从这个顺序开始：
 

@@ -1,4 +1,4 @@
-"""调试 `upsert_chunks` / `query_collection` 的离线脚本。
+"""调试 `upsert_chunks` / `query_collection` 的示例脚本。
 
 适合学习：
 - chunk + embedding 是如何写入 Chroma 的
@@ -11,7 +11,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from _debug_common import build_demo_chunks, preview_text, print_kv, print_title
+from _debug_common import build_demo_chunks, get_embedding_model_name, preview_text, print_kv, print_title
 
 from pdf2md_rag.embeddings import build_embedder
 from pdf2md_rag.vectorstore import query_collection, upsert_chunks
@@ -21,7 +21,8 @@ def main() -> None:
     print_title("debug_vectorstore")
 
     chunks = build_demo_chunks()
-    embedder = build_embedder(embedder_type="hash", model_name="unused", hash_dimensions=64)
+    model_name = get_embedding_model_name()
+    embedder = build_embedder(embedder_type="sentence-transformers", model_name=model_name)
     embeddings = embedder.embed_texts([chunk.text for chunk in chunks])
 
     # 用临时目录避免污染真实数据目录；脚本结束后自动清理。
@@ -42,6 +43,7 @@ def main() -> None:
         )
 
         print_kv("persist_dir", persist_directory)
+        print_kv("model_name", model_name)
         print_kv("stored_count", summary["count"])
         print_kv("row_count", len(rows))
         for row in rows:

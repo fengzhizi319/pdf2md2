@@ -18,6 +18,9 @@ from typing import TYPE_CHECKING
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = PROJECT_ROOT / "src"
 PDF_PATH = PROJECT_ROOT / "pdf/Understanding Lasso – A Novel Lookup Argument Protocol.pdf"
+# DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+DEFAULT_EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
+
 
 
 def bootstrap_debug_environment() -> None:
@@ -54,6 +57,11 @@ def preview_text(text: str, limit: int = 220) -> str:
     """把多行文本压成单行预览，适合在 debug 输出里快速扫一眼。"""
     single_line = " ".join(text.split())
     return single_line[:limit] + ("..." if len(single_line) > limit else "")
+
+
+def get_embedding_model_name() -> str:
+    """返回 examples 脚本统一使用的真实 embedding 模型名。"""
+    return os.getenv("PDF2MD_RAG_EMBEDDING_MODEL", DEFAULT_EMBEDDING_MODEL)
 
 
 def build_demo_chunks() -> list[Chunk]:

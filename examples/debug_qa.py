@@ -1,4 +1,4 @@
-"""调试 `ask_question` 的离线脚本。
+"""调试 `ask_question` 的示例脚本。
 
 适合学习：
 - QA 层如何复用 search 结果
@@ -13,7 +13,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from _debug_common import build_demo_chunks, preview_text, print_kv, print_title
+from _debug_common import build_demo_chunks, get_embedding_model_name, preview_text, print_kv, print_title
 
 import pdf2md_rag.simple_qa as simple_qa_module
 from pdf2md_rag.embeddings import build_embedder
@@ -25,7 +25,8 @@ def main() -> None:
     print_title("debug_qa")
 
     chunks = build_demo_chunks()
-    embedder = build_embedder(embedder_type="hash", model_name="unused", hash_dimensions=64)
+    model_name = get_embedding_model_name()
+    embedder = build_embedder(embedder_type="sentence-transformers", model_name=model_name)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         persist_directory = Path(temp_dir) / "chroma"
@@ -62,9 +63,8 @@ def main() -> None:
                 collection_name="debug-qa",
                 chroma_dir=persist_directory,
                 top_k=2,
-                embedder_type="hash",
-                embedding_model="unused",
-                hash_dimensions=64,
+                embedder_type="sentence-transformers",
+                embedding_model=model_name,
                 llm_provider="openai-compatible",
                 llm_model="debug-model",
                 llm_base_url="http://debug.local",
@@ -74,6 +74,7 @@ def main() -> None:
 
         print_kv("provider", result.provider)
         print_kv("model", result.model)
+        print_kv("embedding_model", model_name)
         print_kv("sources", result.search_result.sources)
         print_kv("answer_preview", preview_text(result.answer, limit=320))
 

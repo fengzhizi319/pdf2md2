@@ -8,11 +8,11 @@
 
 from __future__ import annotations
 
-from _debug_common import PDF_PATH, preview_text, print_kv, print_title
+from _debug_common import PDF_PATH, get_embedding_model_name, preview_text, print_kv, print_title
 
 from pdf2md_rag.chunking import chunk_markdown
 from pdf2md_rag.pdf_to_markdown import extract_markdown
-
+from pdf2md_rag.embeddings import build_embedder
 
 def main() -> None:
     print_title("debug_chunking")
@@ -32,7 +32,15 @@ def main() -> None:
         print_kv("page", chunk.metadata.get("page"))
         print_kv("length", chunk.metadata.get("text_length"))
         print_kv("preview", preview_text(chunk.text, limit=240))
+    model_name = get_embedding_model_name()
+    embedder = build_embedder(embedder_type="sentence-transformers", model_name=model_name)
+    embeddings = embedder.embed_texts([chunk.text for chunk in chunks])
 
+    print_kv("embedder", type(embedder).__name__)
+    print_kv("model_name", model_name)
+    print_kv("vector_count", len(embeddings))
+    print_kv("vector_dim", len(embeddings[0]) if embeddings else 0)
+    print_kv("first_vector_head", [round(value, 4) for value in embeddings[0][:8]])
 
 if __name__ == "__main__":
     main()

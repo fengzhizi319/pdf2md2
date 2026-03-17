@@ -1,7 +1,10 @@
+import os
 import py_compile
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 
 def test_example_scripts_are_syntax_valid() -> None:
@@ -24,7 +27,10 @@ def test_example_scripts_are_syntax_valid() -> None:
         py_compile.compile(str(file_path), doraise=True)
 
 
-def test_offline_example_scripts_run_successfully() -> None:
+def test_embedding_example_scripts_run_successfully_when_enabled() -> None:
+    if os.getenv("PDF2MD_RAG_RUN_EMBEDDING_EXAMPLES") != "1":
+        pytest.skip("Set PDF2MD_RAG_RUN_EMBEDDING_EXAMPLES=1 to run example integration tests.")
+
     project_root = Path(__file__).resolve().parents[1]
     scripts = [
         "examples/debug_embeddings.py",

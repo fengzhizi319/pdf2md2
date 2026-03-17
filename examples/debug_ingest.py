@@ -10,7 +10,7 @@
 
 from pathlib import Path
 
-from _debug_common import PDF_PATH
+from _debug_common import PDF_PATH, get_embedding_model_name
 
 from pdf2md_rag.config import (
     DEFAULT_CHROMA_DIR,
@@ -22,15 +22,14 @@ from pdf2md_rag.pipeline import ingest_pdf
 
 
 def main() -> None:
-    # 用 hash embedder 作为默认调试模式，避免为了学习代码先下载 embedding 模型。
+    model_name = get_embedding_model_name()
     config = PipelineConfig(
         markdown_dir=DEFAULT_MARKDOWN_DIR,
         chroma_dir=DEFAULT_CHROMA_DIR,
         manifest_dir=DEFAULT_MANIFEST_DIR,
-        collection_name="understanding-lasso-hash-debug",
-        embedder_type="hash",
-        embedding_model="unused",
-        hash_embedding_dimensions=384,
+        collection_name="understanding-lasso-st-debug",
+        embedder_type="sentence-transformers",
+        embedding_model=model_name,
         chunk_size=1200,
         chunk_overlap=200,
     )
@@ -45,6 +44,7 @@ def main() -> None:
     print(f"Markdown  : {markdown_path} | exists={markdown_path.exists()}")
     print(f"Manifest  : {manifest_path} | exists={manifest_path.exists()}")
     print(f"Collection: {result.collection_name}")
+    print(f"Embedding : {model_name}")
     print(f"Pages     : {result.page_count}")
     print(f"Chunks    : {result.chunk_count}")
     print(f"Vectors   : {result.vector_count}")
