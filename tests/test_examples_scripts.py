@@ -17,6 +17,7 @@ def test_example_scripts_are_syntax_valid() -> None:
         "debug_embeddings.py",
         "debug_extract_markdown.py",
         "debug_ingest.py",
+        "debug_langgraph.py",
         "debug_qa.py",
         "debug_search.py",
         "debug_vectorstore.py",

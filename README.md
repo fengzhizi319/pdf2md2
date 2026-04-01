@@ -110,6 +110,7 @@ python examples/debug_embeddings.py
 python examples/debug_vectorstore.py
 python examples/debug_search.py
 python examples/debug_qa.py
+python examples/debug_langgraph.py
 ```
 
 ## 工程化配置
@@ -190,6 +191,16 @@ python examples/debug_ingest.py
 ```
 
 如果你在 macOS 的 conda 环境里运行，项目会在调用 Marker 前自动设置一层 OpenMP 兼容开关，避免部分 `libomp` 重复加载导致进程直接 abort。
+
+如果你想单独学习工作流/agent 编排，而不是直接进入 RAG 主链路，可以运行：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+python examples/debug_langgraph.py
+```
+
+这个脚本不依赖真实 LLM，会用一个内置的小型知识库演示 `StateGraph`、条件分支、`invoke()` 和 `stream()`，适合作为 LangGraph 入门样例。
 
 它内部直接调用：
 
