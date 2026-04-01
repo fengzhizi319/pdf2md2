@@ -113,6 +113,7 @@ python examples/debug_qa.py
 python examples/debug_langgraph.py
 python examples/debug_langgraph_local_chroma.py
 python examples/debug_langgraph_rag.py
+python examples/debug_langgraph_rag_advanced.py
 ```
 
 ## 工程化配置
@@ -271,6 +272,52 @@ python examples/debug_langgraph_local_chroma.py
 ```
 
 这个示例特别适合学习“为什么图编排在真实知识库场景下仍然有价值”：因为你能把 collection 校验、检索失败处理、无命中兜底和生成阶段分成清晰的节点，而不是把所有逻辑塞进一个函数。
+
+如果你想进一步看一个**更像 production 的 RAG graph**，可以运行 `examples/debug_langgraph_rag_advanced.py`。这个脚本会在基本的“分析 -> 检索 -> 生成”之外，再演示：
+
+- `rewrite_question`
+- `grade_retrieval`
+- `retry_search`
+- `fallback_answer`
+
+也就是说，它不再假设“检索一次就一定够好”，而是会：
+
+1. 先分析问题
+2. 生成更适合检索的查询候选
+3. 执行检索
+4. 给检索质量打分
+5. 如果结果太弱，就自动换一个 query 重试
+6. 如果重试后还是不够好，就返回一个诚实的 fallback answer
+
+默认它使用离线 fake LLM，所以不需要真实模型服务就能学习图编排：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+python examples/debug_langgraph_rag_advanced.py
+```
+
+如果你想切到真实模型，也可以：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+
+# OpenAI-compatible
+OPENAI_API_KEY=<your-key> \
+PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
+PDF2MD_RAG_LLM_BASE_URL=https://api.openai.com \
+PDF2MD_RAG_LLM_MODEL=gpt-4o-mini \
+python examples/debug_langgraph_rag_advanced.py
+
+# Ollama
+PDF2MD_RAG_LLM_PROVIDER=ollama \
+PDF2MD_RAG_LLM_BASE_URL=http://localhost:11434 \
+PDF2MD_RAG_LLM_MODEL=qwen2.5:3b \
+python examples/debug_langgraph_rag_advanced.py
+```
+
+这个例子特别适合学习：为什么 production RAG 往往会出现“改写 query、重新检索、给检索打分、最后优雅降级”这些环节，而不是只做一次 naive retrieval。
 
 它内部直接调用：
 
