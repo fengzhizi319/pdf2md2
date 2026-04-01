@@ -114,6 +114,7 @@ python examples/debug_langgraph.py
 python examples/debug_langgraph_local_chroma.py
 python examples/debug_langgraph_rag.py
 python examples/debug_langgraph_rag_advanced.py
+python examples/debug_langgraph_rag_router_rerank.py
 ```
 
 ## 工程化配置
@@ -318,6 +319,56 @@ python examples/debug_langgraph_rag_advanced.py
 ```
 
 这个例子特别适合学习：为什么 production RAG 往往会出现“改写 query、重新检索、给检索打分、最后优雅降级”这些环节，而不是只做一次 naive retrieval。
+
+如果你想继续往更接近生产环境的方向走，可以运行 `examples/debug_langgraph_rag_router_rerank.py`。这个版本在 advanced graph 的基础上进一步加入：
+
+- `route_question`
+- `rerank_hits`
+
+也就是说，它会先判断问题更像哪一类：
+
+- grounding / citations 问题
+- robustness / retry / fallback 问题
+- metadata / heading / page 问题
+- general explanation 问题
+
+然后再根据路由结果：
+
+1. 选择更合适的 retrieval plan
+2. 生成 route-aware query
+3. 先做原始检索
+4. 再对 hits 进行 rerank
+5. 然后才决定是生成答案、继续重试，还是 fallback
+
+默认也是离线 fake LLM，因此你可以先专心学习图编排：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+python examples/debug_langgraph_rag_router_rerank.py
+```
+
+如果想切到真实模型，同样支持：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+
+# OpenAI-compatible
+OPENAI_API_KEY=<your-key> \
+PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
+PDF2MD_RAG_LLM_BASE_URL=https://api.openai.com \
+PDF2MD_RAG_LLM_MODEL=gpt-4o-mini \
+python examples/debug_langgraph_rag_router_rerank.py
+
+# Ollama
+PDF2MD_RAG_LLM_PROVIDER=ollama \
+PDF2MD_RAG_LLM_BASE_URL=http://localhost:11434 \
+PDF2MD_RAG_LLM_MODEL=qwen2.5:3b \
+python examples/debug_langgraph_rag_router_rerank.py
+```
+
+这个版本特别适合学习：为什么在真实 RAG 系统里，检索前的 router 和检索后的 rerank 往往都会对最终答案质量产生明显影响。
 
 它内部直接调用：
 
