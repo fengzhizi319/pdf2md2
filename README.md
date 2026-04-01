@@ -111,6 +111,7 @@ python examples/debug_vectorstore.py
 python examples/debug_search.py
 python examples/debug_qa.py
 python examples/debug_langgraph.py
+python examples/debug_langgraph_local_chroma.py
 python examples/debug_langgraph_rag.py
 ```
 
@@ -234,6 +235,42 @@ PDF2MD_RAG_LLM_BASE_URL=http://localhost:11434 \
 PDF2MD_RAG_LLM_MODEL=qwen2.5:3b \
 python examples/debug_langgraph_rag.py
 ```
+
+如果你想让 LangGraph 直接连接**已经落盘的真实本地 Chroma 知识库**，可以运行 `examples/debug_langgraph_local_chroma.py`。这个脚本不会创建临时 demo 向量库，而是直接读取 `data/chroma/`，并把流程拆成：
+
+- 分析问题
+- 校验本地知识库/collection
+- 从真实 collection 检索上下文
+- 生成答案（默认 fake LLM，也可切到 OpenAI-compatible / Ollama）
+
+例如：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+
+# 先离线学习图结构（默认 fake LLM）
+python examples/debug_langgraph_local_chroma.py
+
+# 指定真实 collection
+PDF2MD_RAG_COLLECTION=understanding-lasso \
+python examples/debug_langgraph_local_chroma.py
+
+# 如果 collection 是 hash embedding
+PDF2MD_RAG_COLLECTION=understanding-lasso-hash-debug \
+PDF2MD_RAG_EMBEDDER=hash \
+PDF2MD_RAG_EMBEDDING_MODEL=unused \
+python examples/debug_langgraph_local_chroma.py
+
+# 切到 OpenAI-compatible
+OPENAI_API_KEY=<your-key> \
+PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
+PDF2MD_RAG_LLM_BASE_URL=https://api.openai.com \
+PDF2MD_RAG_LLM_MODEL=gpt-4o-mini \
+python examples/debug_langgraph_local_chroma.py
+```
+
+这个示例特别适合学习“为什么图编排在真实知识库场景下仍然有价值”：因为你能把 collection 校验、检索失败处理、无命中兜底和生成阶段分成清晰的节点，而不是把所有逻辑塞进一个函数。
 
 它内部直接调用：
 

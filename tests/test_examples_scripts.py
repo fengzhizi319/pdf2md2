@@ -18,6 +18,7 @@ def test_example_scripts_are_syntax_valid() -> None:
         "debug_extract_markdown.py",
         "debug_ingest.py",
         "debug_langgraph.py",
+        "debug_langgraph_local_chroma.py",
         "debug_langgraph_rag.py",
         "debug_qa.py",
         "debug_search.py",
