@@ -111,6 +111,7 @@ python examples/debug_vectorstore.py
 python examples/debug_search.py
 python examples/debug_qa.py
 python examples/debug_langgraph.py
+python examples/debug_langgraph_rag.py
 ```
 
 ## 工程化配置
@@ -201,6 +202,38 @@ python examples/debug_langgraph.py
 ```
 
 这个脚本不依赖真实 LLM，会用一个内置的小型知识库演示 `StateGraph`、条件分支、`invoke()` 和 `stream()`，适合作为 LangGraph 入门样例。
+
+如果你想看一个更贴近真实 Agent / RAG 工作流的版本，可以运行 `examples/debug_langgraph_rag.py`。它会把流程拆成“分析问题 -> 检索上下文 -> 调用 LLM 生成答案”三个节点，并支持：
+
+- OpenAI 官方接口
+- 本地 OpenAI-compatible 服务（如 LM Studio / vLLM / llama.cpp server）
+- Ollama
+
+例如：
+
+```bash
+cd ~/Documents/AI/pdf2md
+source .venv/bin/activate
+
+# OpenAI
+OPENAI_API_KEY=<your-key> \
+PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
+PDF2MD_RAG_LLM_BASE_URL=https://api.openai.com \
+PDF2MD_RAG_LLM_MODEL=gpt-4o-mini \
+python examples/debug_langgraph_rag.py
+
+# 本地 OpenAI-compatible
+PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
+PDF2MD_RAG_LLM_BASE_URL=http://localhost:1234 \
+PDF2MD_RAG_LLM_MODEL=qwen2.5-7b-instruct \
+python examples/debug_langgraph_rag.py
+
+# Ollama
+PDF2MD_RAG_LLM_PROVIDER=ollama \
+PDF2MD_RAG_LLM_BASE_URL=http://localhost:11434 \
+PDF2MD_RAG_LLM_MODEL=qwen2.5:3b \
+python examples/debug_langgraph_rag.py
+```
 
 它内部直接调用：
 
