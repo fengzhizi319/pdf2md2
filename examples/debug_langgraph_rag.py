@@ -33,9 +33,8 @@
    PDF2MD_RAG_LLM_MODEL=qwen3.5:0.8b \
    python examples/debug_langgraph_rag.py
 
-默认 embedding 在 `openai-compatible` 场景下仍使用项目里的 `sentence-transformers`，因为这样更适合演示"检索"阶段。
-但如果你走的是本地 `ollama`，脚本会默认切到 `hash` embedding，避免在离线环境里额外下载 Hugging Face 模型。
-如果你希望在 Ollama 场景里仍使用真实语义 embedding，也可以显式设置 `PDF2MD_RAG_EMBEDDER` 和 `PDF2MD_RAG_EMBEDDING_MODEL`。
+默认 embedding 在 `openai-compatible` 和 `ollama` 场景下都使用项目里的 `sentence-transformers`，默认模型名是 `BAAI/bge-small-en-v1.5`。
+如果你希望显式切换 embedding 后端，也可以通过 `PDF2MD_RAG_EMBEDDER` 和 `PDF2MD_RAG_EMBEDDING_MODEL` 覆盖。
 """
 
 from __future__ import annotations
@@ -241,8 +240,8 @@ def resolve_runtime_config() -> RuntimeConfig:
         # Ollama 本地服务
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", os.getenv("OLLAMA_HOST", "http://localhost:11434"))
         llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen3.5:0.8b")
-        default_embedder_type = "hash"
-        default_embedding_model = "unused"
+        default_embedder_type = "sentence-transformers"
+        default_embedding_model = get_embedding_model_name()
     else:
         raise ValueError(f"Unsupported llm provider: {provider}")
 

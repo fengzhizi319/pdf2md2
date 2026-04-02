@@ -34,8 +34,8 @@ def test_resolve_runtime_config_defaults_ollama_model_to_qwen35(monkeypatch) -> 
 
     assert runtime.llm_provider == "ollama"
     assert runtime.llm_model == "qwen3.5:0.8b"
-    assert runtime.embedder_type == "hash"
-    assert runtime.embedding_model == "unused"
+    assert runtime.embedder_type == "sentence-transformers"
+    assert runtime.embedding_model == "BAAI/bge-small-en-v1.5"
 
 
 
@@ -52,15 +52,15 @@ def test_resolve_runtime_config_defaults_openai_compatible_embedding_stays_real(
     assert runtime.llm_provider == "openai-compatible"
     assert runtime.llm_model == "gpt-4o-mini"
     assert runtime.embedder_type == "sentence-transformers"
-    assert runtime.embedding_model == "BAAI/bge-base-en-v1.5"
+    assert runtime.embedding_model == "BAAI/bge-small-en-v1.5"
 
 
 
 def test_probe_ollama_connectivity_uses_ollama_chat_endpoint(monkeypatch) -> None:
     module = _load_module()
     runtime = module.RuntimeConfig(
-        embedder_type="hash",
-        embedding_model="unused",
+        embedder_type="sentence-transformers",
+        embedding_model="BAAI/bge-small-en-v1.5",
         hash_dimensions=128,
         collection_name="demo",
         top_k=3,

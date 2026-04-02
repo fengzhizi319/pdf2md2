@@ -31,7 +31,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, TypedDict, cast
 
-from _debug_common import preview_text, print_kv, print_title
+from _debug_common import preview_text, print_kv, print_title, get_embedding_model_name
 from langgraph.graph import END, START, StateGraph
 
 import pdf2md_rag.simple_qa as simple_qa_module
@@ -244,14 +244,14 @@ def resolve_runtime_config() -> RuntimeConfig:
         llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "gpt-4o-mini")
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", "https://api.openai.com")
     elif provider == "ollama":
-        llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen2.5:3b")
+        llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen3.5:0.8b")
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", os.getenv("OLLAMA_HOST", "http://localhost:11434"))
     else:
         raise ValueError(f"Unsupported llm provider: {provider}")
 
     return RuntimeConfig(
-        embedder_type=os.getenv("PDF2MD_RAG_EMBEDDER", "hash"),
-        embedding_model=os.getenv("PDF2MD_RAG_EMBEDDING_MODEL", "unused"),
+        embedder_type=os.getenv("PDF2MD_RAG_EMBEDDER", "sentence-transformers"),
+        embedding_model=os.getenv("PDF2MD_RAG_EMBEDDING_MODEL", get_embedding_model_name()),
         hash_dimensions=int(os.getenv("PDF2MD_RAG_HASH_DIMENSIONS", "128")),
         collection_name=os.getenv("PDF2MD_RAG_COLLECTION", "debug-langgraph-rag-advanced"),
         top_k=int(os.getenv("PDF2MD_RAG_TOP_K", "3")),

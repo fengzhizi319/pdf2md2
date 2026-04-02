@@ -28,23 +28,17 @@
    PDF2MD_RAG_COLLECTION=understanding-lasso \
    python examples/debug_langgraph_local_chroma.py
 
-3) 如果你的 collection 是 hash embedding：
-   PDF2MD_RAG_COLLECTION=understanding-lasso-hash-debug \
-   PDF2MD_RAG_EMBEDDER=hash \
-   PDF2MD_RAG_EMBEDDING_MODEL=unused \
-   python examples/debug_langgraph_local_chroma.py
-
-4) 接 OpenAI-compatible：
+3) 接 OpenAI-compatible：
    OPENAI_API_KEY=<your-key> \
    PDF2MD_RAG_LLM_PROVIDER=openai-compatible \
    PDF2MD_RAG_LLM_BASE_URL=https://api.openai.com \
    PDF2MD_RAG_LLM_MODEL=gpt-4o-mini \
    python examples/debug_langgraph_local_chroma.py
 
-5) 接 Ollama：
+4) 接 Ollama：
    PDF2MD_RAG_LLM_PROVIDER=ollama \
    PDF2MD_RAG_LLM_BASE_URL=http://localhost:11434 \
-   PDF2MD_RAG_LLM_MODEL=qwen2.5:3b \
+   PDF2MD_RAG_LLM_MODEL=qwen3.5:0.8b \
    python examples/debug_langgraph_local_chroma.py
 """
 
@@ -136,15 +130,7 @@ def choose_default_collection(available_collections: list[str]) -> str:
 
 
 def infer_embedder_defaults(collection_name: str) -> tuple[str, str]:
-    """根据 collection 名称做一个教学友好的 embedder 默认推断。
-
-    这不是强约束，只是为了降低首次运行门槛：
-    - collection 名里带 `hash`，通常意味着当初是用 hash embedder 写入的
-    - 否则默认按 sentence-transformers 处理
-    """
-    lowered = collection_name.lower()
-    if "hash" in lowered:
-        return "hash", "unused"
+    """返回本示例统一使用的默认 embedding 设置。"""
     return "sentence-transformers", get_embedding_model_name()
 
 
@@ -168,7 +154,7 @@ def resolve_runtime_config() -> RuntimeConfig:
         llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "gpt-4o-mini")
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", "https://api.openai.com")
     elif provider == "ollama":
-        llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen2.5:3b")
+        llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen3.5:0.8b")
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", os.getenv("OLLAMA_HOST", "http://localhost:11434"))
     else:
         raise ValueError(f"Unsupported llm provider: {provider}")
