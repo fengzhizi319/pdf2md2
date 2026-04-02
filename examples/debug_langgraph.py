@@ -85,8 +85,50 @@ def analyze_question(state: DemoState) -> DemoState:
     - 规范化问题文本（去掉首尾空白）
     - 初步判断：问题是否足够明确，可以直接进入“检索”分支
     """
+    """语法点：
+    strip()
+       -Python 字符串内置方法
+       -功能：移除字符串首尾的空白字符（空格、制表符、换行符等）
+       -返回值：新的字符串对象
+    # 假设输入
+     state = {"user_question": "  LangGraph 是什么？  \n"}
+    # 执行后
+    normalized_question = "LangGraph 是什么？"  # 去除了首尾空白
+    """
     normalized_question = state["user_question"].strip()
     topic = detect_topic(normalized_question)
+    """语法点：
+    1.Literal 是 Python typing 模块提供的类型约束工具，用于指定变量只能取特定的字面值。
+    语法格式：
+    from typing import Literal
+    variable_name: Literal[value1, value2, ...] = initial_value
+    作用：
+    -限制变量只能是预定义的某几个值之一
+    -提供编译时类型检查（IDE/静态分析工具会报错）
+    -增强代码可读性和自文档化
+    2. 这行代码的两层含义
+    声明 intent 变量只能取两个值："retrieve" 或 "clarify"
+    不能赋其他任何值（如 "unknown"、"test" 等）
+    - 如果 `topic` 有值，就将 `intent` 设置为 "retrieve"
+    - 如果 `topic` 没有值，就将 `intent` 设置为 "clarify"
+    3.三元表达式详解
+    "retrieve" if topic else "clarify"
+    这是一个三元条件表达式（Ternary Operator）
+
+    condition ? true_value : false_value
+    作用：
+    -根据条件判断返回不同的值
+    -在代码中实现简单的分支逻辑
+    -注意：三元表达式通常用于简单的条件判断，避免嵌套多个 if-else 语句
+    4. 为什么使用 Literal？
+    - 提供类型检查，防止运行时错误
+    - 增强代码可读性和自文档化
+    # ❌ 普通字符串类型
+    intent: str = "retrieve" if topic else "clarify"
+    # 问题：无法防止拼写错误
+    intent = "retreive"  # 拼写错误，但类型检查不会发现！
+    intent = "anything"  # 任意字符串都合法
+    """
     intent: Literal["retrieve", "clarify"] = "retrieve" if topic else "clarify"
 
     return {
