@@ -18,8 +18,8 @@ from typing import TYPE_CHECKING
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = PROJECT_ROOT / "src"
 PDF_PATH = PROJECT_ROOT / "pdf/Understanding Lasso – A Novel Lookup Argument Protocol.pdf"
-# DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
-DEFAULT_EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
+DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+# DEFAULT_EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 
 
 

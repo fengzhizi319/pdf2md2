@@ -33,8 +33,9 @@
    PDF2MD_RAG_LLM_MODEL=qwen3.5:0.8b \
    python examples/debug_langgraph_rag.py
 
-默认 embedding 仍使用项目里的 `sentence-transformers`，因为这样更适合演示"检索"阶段。
-如果你只想快速跑通结构，也可以把 `PDF2MD_RAG_EMBEDDER=hash`，但检索质量会明显下降。
+默认 embedding 在 `openai-compatible` 场景下仍使用项目里的 `sentence-transformers`，因为这样更适合演示"检索"阶段。
+但如果你走的是本地 `ollama`，脚本会默认切到 `hash` embedding，避免在离线环境里额外下载 Hugging Face 模型。
+如果你希望在 Ollama 场景里仍使用真实语义 embedding，也可以显式设置 `PDF2MD_RAG_EMBEDDER` 和 `PDF2MD_RAG_EMBEDDING_MODEL`。
 """
 
 from __future__ import annotations
@@ -229,21 +230,25 @@ def resolve_runtime_config() -> RuntimeConfig:
     if not provider:
         provider = "openai-compatible" if api_key else "ollama"
 
-    # 根据 provider 类型设置对应的 base URL 和 model
+    # 根据 provider 类型设置对应的 base URL、model 和 embedding 默认值
     if provider in {"openai", "openai-compatible", "openai_compatible", "openai-compatible-http"}:
         # OpenAI 官方或兼容接口
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", "https://api.openai.com")
         llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "gpt-4o-mini")
+        default_embedder_type = "sentence-transformers"
+        default_embedding_model = get_embedding_model_name()
     elif provider == "ollama":
         # Ollama 本地服务
         llm_base_url = os.getenv("PDF2MD_RAG_LLM_BASE_URL", os.getenv("OLLAMA_HOST", "http://localhost:11434"))
         llm_model = os.getenv("PDF2MD_RAG_LLM_MODEL", "qwen3.5:0.8b")
+        default_embedder_type = "hash"
+        default_embedding_model = "unused"
     else:
         raise ValueError(f"Unsupported llm provider: {provider}")
 
     return RuntimeConfig(
-        embedder_type=os.getenv("PDF2MD_RAG_EMBEDDER", "sentence-transformers"),
-        embedding_model=os.getenv("PDF2MD_RAG_EMBEDDING_MODEL", get_embedding_model_name()),
+        embedder_type=os.getenv("PDF2MD_RAG_EMBEDDER", default_embedder_type),
+        embedding_model=os.getenv("PDF2MD_RAG_EMBEDDING_MODEL", default_embedding_model),
         hash_dimensions=int(os.getenv("PDF2MD_RAG_HASH_DIMENSIONS", "384")),
         collection_name=os.getenv("PDF2MD_RAG_COLLECTION", "debug-langgraph-rag"),
         top_k=int(os.getenv("PDF2MD_RAG_TOP_K", "3")),
